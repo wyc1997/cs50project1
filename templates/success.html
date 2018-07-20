@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Success!
+{% endblock %}
+
+{% block body %}
+    <h1>You registered successfully!</h1>
+    <form action="{{ url_for("index") }}" method="get">
+        <button class="btn btn-primary">Login now</button>
+    </form>
+{% endblock %}
