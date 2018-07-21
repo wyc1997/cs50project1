@@ -32,9 +32,29 @@ def register():
 
     if (db.execute("SELECT * FROM users WHERE username=:un", {"un": username}).rowcount) != 0:
         return render_template("error.html", message="username already exists")
-    db.execute("INSERT INTO users (username, password) VALUES (:username, :password)", {"username": username, "password": password})
+    else:
+        db.execute("INSERT INTO users (username, password) VALUES (:username, :password)", {"username": username, "password": password})
+    db.commit()
     return render_template("success.html")
 
-@app.route("/login")
+@app.route("/login/", methods=["POST"])
 def login():
+    user = request.form.get("Registered_name")
+    pas = request.form.get("Registered_Password")
+
+    if (db.execute("SELECT password FROM users WHERE username=:u", {"u":user}).fetchone())[0] != pas:
+        return render_template("error.html", message = "Incorrect username or password")
+    else:
+        return render_template("search.html", name=user)
+
+@app.route("/result/", methods=["POST"])
+def result():
+    isbn = request.form.get("isbn")
+    title = request.form.get("title")
+    author = request.form.get("author")
+
+    rs = db.execute("SELECT * FROM books WHERE isbn LIKE '%:isbn%' AND title LIKE '%:title%' AND author LIKE '%:author%'", {"isbn":isbn, "title":title, "author":author}).fetchall()
+    if len(rs) == 0:
+        return render_template("error.html", message="No matching result found")
+
     return

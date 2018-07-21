@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Search for a book
+{% endblock %}
+
+{% block body %}
+    <h1>Welcome! {{ name }}</h1>
+    <a href="{{ url_for("index") }}">logout</a>
+    <div>
+        <a>search for a book</a>
+    </div>
+
+    <div>
+        <form action="{{ url_for("result") }}" method="post">
+            <div>
+                <a>isbn:</a>
+                <input name="isbn" placeholder="isbn">
+            </div>
+            <div>
+                <a>Title</a>
+                <input name="title" placeholder="title">
+            </div>
+            <div>
+                <a>Author</a>
+                <input name="author" placeholder="author">
+            </div>
+            <button>Search</button>
+        </form>
+    <div>
+{% endblock %}
