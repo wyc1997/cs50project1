@@ -52,9 +52,32 @@ def result():
     isbn = request.form.get("isbn")
     title = request.form.get("title")
     author = request.form.get("author")
+    if isbn == '' and title == '' and author == '':
+        return render_template("error.html", message="Please key in something to find a book")
 
-    rs = db.execute("SELECT * FROM books WHERE isbn LIKE '%:isbn%' AND title LIKE '%:title%' AND author LIKE '%:author%'", {"isbn":isbn, "title":title, "author":author}).fetchall()
+    select_dic = {}
+    select_clause = "SELECT * FROM books WHERE"
+    if isbn != '':
+        select_clause += " isbn LIKE :isbn AND"
+        select_dic["isbn"] = '%'+isbn+'%'
+    if title != '':
+        select_clause += " title LIKE :title AND"
+        select_dic["title"] = '%'+title+'%'
+    if author != '':
+        select_clause += " author LIKE :author"
+        select_dic["author"] = '%'+author+'%'
+    if select_clause[-3:] == "AND":
+        select_clause = select_clause[0:-3]
+
+    rs = db.execute(select_clause, select_dic).fetchall()
+
     if len(rs) == 0:
         return render_template("error.html", message="No matching result found")
+
+    return render_template("select.html", rs=rs)
+
+@app.route("/book/<string:book_id>", methods=["POST", "GET"])
+def book(book_id):
+    
 
     return

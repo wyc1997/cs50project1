@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Select your book
+{% endblock %}
+
+{% block body %}
+<h1>Select your book</h1>
+<ul>
+    {% for book in rs %}
+        <li>
+            <a href="{{url_for('book', book_id=book.isbn)}}">{{book.title}}, {{book.author}}</a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}
