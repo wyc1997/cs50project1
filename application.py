@@ -1,6 +1,7 @@
 import os
+import requests
 
-from flask import Flask, session, render_template, request
+from flask import Flask, session, render_template, request, jsonify
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -80,8 +81,26 @@ def result():
 def book(book_id):
     bk = db.execute("SELECT * FROM books WHERE isbn=:isbn", {"isbn": book_id}).fetchone()
     new_rv = request.form.get("new_rv")
+    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "hv1zdwHySHnjlV2RDf2Q", "isbns":bk.isbn}).json()["books"][0]
     if new_rv != ('' or None):
         db.execute("INSERT INTO reviews (isbn, review) VALUES (:isbn, :review)", {"isbn": book_id, "review": new_rv})
         db.commit()
     rvs = db.execute("SELECT * FROM reviews WHERE isbn=:isbn", {"isbn": book_id}).fetchall()
-    return render_template("book.html", book = bk, rvs = rvs)
+    return render_template("book.html", book = bk, rvs = rvs, res = res)
+
+@app.route("/api/<string:isbn>")
+def api(isbn):
+    rs = db.execute("SELECT * FROM books WHERE isbn=:isbn", {"isbn": isbn})
+    if rs.rowcount == 0:
+        return render_template("error.html", message="book not found")
+
+    result = {}
+    bk = rs.fetchall()[0]
+    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "hv1zdwHySHnjlV2RDf2Q", "isbns":bk.isbn}).json()["books"][0]
+    result["title"] = bk.title
+    result["author"] = bk.author
+    result["year"] = bk.year
+    result["isbn"] = bk.isbn
+    result["reviews_count"] = res["reviews_count"]
+    result["average_score"] = res["average_rating"]
+    return jsonify(result)
