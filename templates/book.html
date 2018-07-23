@@ -5,6 +5,34 @@ details
 {% endblock %}
 
 {% block body %}
-<h1>Here's your book</h1>
+<h1>{{ book.title }} by {{ book.author }}</h1>
+<div>
+    <ul>
+        <li>Publication Year: {{ book.year }}</li>
+        <li>ISBN Number: {{ book.isbn }}</li>
+    </ul>
+</div>
 
+<div>
+    <h3>Book reviews</h3>
+    <ul>
+    {% for re in rvs %}
+        <li>{{ re.review }}</li>
+    {% endfor %}
+    </ul>
+</div>
+
+<div>
+    <form action="{{ url_for('sub_rv', book_id=book.isbn) }}" method="post">
+        <div>
+            <a>Write your review</a>
+        </div>
+        <div>
+            <textarea placeholder="your review for this book" name="new_rv"></textarea>
+        </div>
+        <div>
+            <button>Submit</button>
+        </div>
+    </form>
+</div>
 {% endblock %}

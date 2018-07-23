@@ -78,6 +78,13 @@ def result():
 
 @app.route("/book/<string:book_id>", methods=["POST", "GET"])
 def book(book_id):
-    
+    bk = db.execute("SELECT * FROM books WHERE isbn=:isbn", {"isbn": book_id}).fetchone()
+    rvs = db.execute("SELECT * FROM reviews WHERE isbn=:isbn", {"isbn": book_id}).fetchall()
+    return render_template("book.html", book = bk, rvs = rvs)
 
-    return
+@app.route("/book/<string:book_id>/sub_rv", methods=["POST"])
+def sub_rv(book_id):
+    new_rv = request.form.get("new_rv")
+    db.execute("INSERT INTO reviews (isbn, review) VALUES (:isbn, :review)", {"isbn": book_id, "review": new_rv})
+    db.commit()
+    return book(book_id)
